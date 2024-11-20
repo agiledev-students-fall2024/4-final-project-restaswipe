@@ -1,6 +1,8 @@
-import { app } from "../app.js";
+import restaurants from "../../restaurants.json" assert { type: 'json' };;
+import { Router } from "express";
 
-app.get('/restaurants', async (req, res) => {
+const router = Router()
+router.get('/restaurants', async (req, res) => {
   try {
     const {
       page = 1,
@@ -47,20 +49,20 @@ app.get('/restaurants', async (req, res) => {
 });
 
 // Like a restaurant
-app.post('/restaurant/:id/like', (req, res) => {
+router.post('/restaurant/:id/like', (req, res) => {
   const restaurant_id = req.params.id;
   console.log(`Restaurant ${restaurant_id} liked`);
   res.send(`Restaurant ${restaurant_id} liked`);
 });
 
-app.post('/restaurant/:id/dislike', (req, res) => {
+router.post('/restaurant/:id/dislike', (req, res) => {
   const restaurant_id = req.params.id;
   console.log(`Restaurant ${restaurant_id} disliked`);
   res.send(`Restaurant ${restaurant_id} disliked`);
 });
 
 
-app.get('/restaurant/search', async (req, res) => {
+router.get('/restaurant/search', async (req, res) => {
   try {
     const query = req.query.query;
 
@@ -68,7 +70,6 @@ app.get('/restaurant/search', async (req, res) => {
       return res.status(400).send('Missing query parameter');
     }
 
-    //TODO: Add restaurants
     const search_results = restaurants.filter(restaurant => restaurant.name.toLowerCase().includes(query.toLowerCase()));
 
     res.json(search_results);
@@ -78,3 +79,4 @@ app.get('/restaurant/search', async (req, res) => {
   }
 });
 
+export default router;

@@ -1,2 +1,2 @@
-const restaurants = require('./restaurants.json');
-module.exports = restaurants;
+import restaurants from './restaurants.json';
+export default restaurants;
