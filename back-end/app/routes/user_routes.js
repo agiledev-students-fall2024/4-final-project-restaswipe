@@ -1,37 +1,24 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const mongoose = require("mongoose"); 
-const User = require("../models/User");
+const passport = require('passport');
+const User = require('../models/User');
 
-router.get("/", async (req, res) => {
-  const user_id = req.query.id;
+const authenticate = passport.authenticate('jwt', { session: false });
 
-  if (!user_id) {
-    console.log("No userId queried");
-    res.status(400).send("No userId queried");
-    return;
-  }
-
-  // Validate if user_id is a valid ObjectId
-  if (!mongoose.Types.ObjectId.isValid(user_id)) {
-    console.log("Invalid userId format");
-    res.status(400).send("Invalid userId format");
-    return;
-  }
-
+// Use authentication middleware to get the authenticated user
+router.get('/', authenticate, async (req, res) => {
   try {
-    const objectId = mongoose.Types.ObjectId(user_id);
-    const user = await User.findById(objectId);
+    const user = await User.findById(req.user._id)
+      .populate('likedRestaurants') // Populate likedRestaurants
 
     if (!user) {
-      console.log("User not found");
-      res.status(404).send("User not found");
-      return;
+      console.log('User not found');
+      return res.status(404).send('User not found');
     }
 
-    res.json(user.toJSON()); // Ensure `toJSON` is implemented in the User schema
+    res.json(user);
   } catch (error) {
-    console.error("Error fetching user:", error);
+    console.error('Error fetching user:', error);
     res.status(500).send(`Error fetching user: ${error}`);
   }
 });

@@ -32,6 +32,6 @@ app.use(express.urlencoded({ extended: true }));
 // Routers
 app.use('/restaurants', restaurantsRouter());
 app.use('/auth', authenticationRouter());
-app.use('/user', userRouter);
+app.use('/user', userRouter());
 
 module.exports = app;
