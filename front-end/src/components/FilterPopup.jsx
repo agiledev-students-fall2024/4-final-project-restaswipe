@@ -66,7 +66,6 @@ const FilterPopup = ({ open, close, onApplyFilters, onSelectRestaurant }) => {
 
   const handleSearchSelect = async (restaurant) => {
     try {
-      // const detailedRestaurant = await fetchRestaurant(restaurant.id);
       onSelectRestaurant(restaurant);
       setSearch('');
       setSearchResults([]);

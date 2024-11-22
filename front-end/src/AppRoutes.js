@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import SwipableFeed from "./components/SwipableFeed";
 import ProfilePage from "./components/Profile";
 import Login from "./Login";
-import { AuthContext } from "../src/contexts/AuthContext";
+import { AuthContext } from "./contexts/AuthContext";
 import Navbar from "./components/Navbar";
 
 const AppRoutes = () => {
@@ -29,7 +29,7 @@ const AppRoutes = () => {
         element={
           isAuthenticated ? (
             <>
-              <Navbar setFilters={setFilters} setSelectedRestaurant={setSelectedRestaurant}/>
+              <Navbar setFilters={setFilters} setSelectedRestaurant={setSelectedRestaurant} />
               <SwipableFeed filters={filters} selectedRestaurant={selectedRestaurant} />
             </>
           ) : (

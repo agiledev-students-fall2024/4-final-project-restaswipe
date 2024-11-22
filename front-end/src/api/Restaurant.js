@@ -1,5 +1,4 @@
-import axios from 'axios';
-import { BACKEND_URL } from './config';
+import { axiosInstance } from './config';
 
 export class Restaurant {
   constructor(id, name, description, location, link, images, pills) {
@@ -20,26 +19,16 @@ export class Restaurant {
   }
 }
 
-/**
- * A function for fetching a small collection of restaurants from the databse
- * Expects json data that has data.restaurants which is an array of restaurants
- *
- * @param userId - The authenticated user's id; function throws error if this is empty
- * @returns A Restaurant object from the desired restaurant
- */
 export async function bulkFetchRestaurants({ page = 1, limit = 20, neighborhood, cuisine }) {
   const params = new URLSearchParams({ page, limit });
 
   if (neighborhood) params.append('neighborhood', neighborhood);
   if (cuisine) params.append('cuisine', cuisine);
 
-  const fetchUrl = `${BACKEND_URL}/restaurants?${params.toString()}`;
-
   try {
-    const response = await axios.get(fetchUrl);
+    const response = await axiosInstance.get(`/restaurants?${params.toString()}`);
     const data = response.data;
 
-    // Adjust based on your API response structure
     const restaurants = data.data.map((restaurantData) => Restaurant.from(restaurantData));
 
     return {
@@ -54,68 +43,30 @@ export async function bulkFetchRestaurants({ page = 1, limit = 20, neighborhood,
 }
 
 export async function searchRestaurants(query) {
-  const fetchUrl = `${BACKEND_URL}/restaurants/search?query=${encodeURIComponent(query)}`;
+  try {
+    const response = await axiosInstance.get(`/restaurants/search?query=${encodeURIComponent(query)}`);
+    const data = response.data;
 
-  const response = await axios.get(fetchUrl);
-  const data = response.data;
-
-  const restaurants = data.map((restaurantData) => Restaurant.from(restaurantData));
-  return restaurants;
+    const restaurants = data.map((restaurantData) => Restaurant.from(restaurantData));
+    return restaurants;
+  } catch (error) {
+    console.error('Error searching for restaurants:', error);
+    return [];
+  }
 }
 
 export async function likeRestaurant(restaurantId) {
-  const url = `${BACKEND_URL}/restaurants/${restaurantId}/like`;
-  await axios.post(url);
+  try {
+    await axiosInstance.post(`/restaurants/${restaurantId}/like`);
+  } catch (error) {
+    console.error(`Error liking restaurant ${restaurantId}:`, error);
+  }
 }
 
 export async function dislikeRestaurant(restaurantId) {
-  const url = `${BACKEND_URL}/restaurants/${restaurantId}/dislike`;
-  await axios.post(url);
-}
-
-export async function fetchLikedRestaurants(userId) {
-  if (!userId) throw new Error("Empty userId. Cannot fetch");
-
-  let fetchUrl = "";
-  if (process.env.NODE_ENV === "production") fetchUrl = "http://backend/api/restaurant";
-  if (process.env.NODE_ENV === "test") fetchUrl = "https://api.mockaroo.com/api";
-  if (process.env.NODE_ENV === "development") return [];
-
-  const response = await fetch(fetchUrl).then((response) => response.json);
-  /* eslint-disable no-array-constructor */
-  const restaurants = new Array();
-  response.restaurants.map((restaurant) => {
-    restaurants.push(Restaurant.from(restaurant));
-  });
-  return restaurants;
-}
-
-/**
- * Fetch a singular restaurant.
- * @param restaurantId - the ID of the restaurant
- * @returns a singular restaurant as type Restaurant
- */
-export async function fetchRestaurant(restaurantId) {
-  if (process.env.NODE_ENV !== "production") {
-    return {
-
-    };
+  try {
+    await axiosInstance.post(`/restaurants/${restaurantId}/dislike`);
+  } catch (error) {
+    console.error(`Error disliking restaurant ${restaurantId}:`, error);
   }
-  if (!restaurantId) throw new Error("Empty restaurantId. Cannot fetch");
-
-  let fetchUrl = "";
-  if (process.env.NODE_ENV === "production") fetchUrl = `http://backend/api/restaurant?id=${restaurantId}`;
-
-  else fetchUrl = "insert dummy api here";
-
-  const response = await fetch(fetchUrl).then((response) => response.json);
-  const restaurants = new Array();
-  response.restaurants.map((restaurant) => {
-    restaurants.push(Restaurant.from(restaurant));
-  });
-  return restaurants;
-}
-
-export async function addRestaurant(restaurantId) {
-
 }

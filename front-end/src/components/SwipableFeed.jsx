@@ -10,9 +10,15 @@ import {
 } from '../api/Restaurant';
 import { SwipableFeedContext } from '../contexts/SwipableFeedContext';
 import { AccountInfoContext } from '../contexts/AccountInfoContext';
+import { AuthContext } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+
 
 const SwipableFeed = ({ filters, selectedRestaurant }) => {
   const { accountInfo } = useContext(AccountInfoContext);
+  const { logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
   const {
     setFilteredRestaurants,
     filteredRestaurants: restaurants,
@@ -80,6 +86,11 @@ const SwipableFeed = ({ filters, selectedRestaurant }) => {
       }
     } catch (error) {
       console.error('Error fetching restaurants:', error);
+      if (error.response && error.response.status === 401) {
+        // Token might be invalid or expired
+        logout();
+        navigate('/login');
+      }
     } finally {
       setIsFetching(false);
     }

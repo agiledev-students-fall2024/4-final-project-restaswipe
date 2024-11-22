@@ -1,6 +1,8 @@
 import React, { useState, useContext } from 'react';
-import { AuthContext } from '../src/contexts/AuthContext';
+import { AuthContext } from './contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { BACKEND_URL } from './api/config';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -14,12 +16,14 @@ const Login = () => {
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Simulate sending OTP
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setShowOtpInput(true);
-      setMessage('OTP has been sent to your email.');
+      const response = await axios.post(`${BACKEND_URL}/auth/request`, { email });
+      if (response.status === 200) {
+        setShowOtpInput(true);
+        setMessage('OTP has been sent to your email.');
+      }
     } catch (error) {
       setMessage('Error sending OTP.');
+      console.error(error);
     }
   };
 
@@ -27,15 +31,13 @@ const Login = () => {
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Simulate OTP validation
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      // Accept any OTP as valid and log in the user
-      await login({ email });
+      const response = await axios.post(`${BACKEND_URL}/auth/verify`, { email, otp });
+      const { token } = response.data;
+      await login(email, token);
       setMessage('Login successful!');
-      // Redirect to feed page
       navigate('/feed');
     } catch (error) {
-      console.log(error);
+      console.error(error);
       setMessage('Invalid OTP.');
     }
   };

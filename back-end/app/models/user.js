@@ -1,31 +1,56 @@
-const mongoose = require("mongoose"); 
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
-const user_schema = new mongoose.Schema(
-  {
-    _id: { type: mongoose.Schema.Types.ObjectId, required: true },
-    name: { type: String, required: true },
-    email: { type: String, required: true },
-    password: { type: String, required: true },
-    profile_pic: { type: String, required: false },
-  },
-  { toJSON: { virtuals: true } } 
-);
-
-// Define a virtual field for `profilePic`
-user_schema.virtual("profilePic").get(function () {
-  return this.profile_pic;
+const UserSchema = new Schema({
+  name: { type: String },
+  email: { type: String, required: true, unique: true },
+  otp: { type: String },
+  otpExpiresAt: { type: Date },
 });
 
-// Modify the JSON output to include virtuals and exclude `profile_pic`
-user_schema.set("toJSON", {
-  virtuals: true,
-  transform: (doc, ret) => {
-    delete ret.profile_pic; // Remove the snake_case field from the JSON output
-    return ret;
-  },
-});
+UserSchema.methods.generateOTP = async function () {
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const hashedOTP = await bcrypt.hash(otp, 10);
+  this.otp = hashedOTP;
+  this.otpExpiresAt = Date.now() + 5 * 60000;
+  await this.save();
+  return otp; 
+};
 
-// Define the User model
-const User = mongoose.model("User", user_schema);
+UserSchema.methods.validateOTP = async function (otpValue) {
+  if (!this.otp || !this.otpExpiresAt) {
+    return false;
+  }
+  if (this.otpExpiresAt < Date.now()) {
+    return false;
+  }
+  const isValid = await bcrypt.compare(otpValue, this.otp);
+  return isValid;
+};
 
-module.exports = User; 
+UserSchema.methods.clearOTP = async function () {
+  this.otp = undefined;
+  this.otpExpiresAt = undefined;
+  await this.save();
+};
+
+UserSchema.methods.generateJWT = function () {
+  const today = new Date();
+  const exp = new Date(today);
+  exp.setDate(today.getDate() + parseInt(process.env.JWT_EXP_DAYS || '1'));
+
+  return jwt.sign(
+    {
+      id: this._id,
+      email: this.email,
+      exp: Math.floor(exp.getTime() / 1000),
+    },
+    process.env.JWT_SECRET
+  );
+};
+
+const User = mongoose.model('User', UserSchema);
+
+module.exports = User;
