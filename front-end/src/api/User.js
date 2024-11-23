@@ -18,7 +18,7 @@ export class User {
 
 export async function fetchUser(email) {
   try {
-    const response = await axiosInstance.get(`/user?email=${encodeURIComponent(email)}`);
+    const response = await axiosInstance.get(`/user`);
     const user = User.from(response.data);
     return user;
   } catch (error) {

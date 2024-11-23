@@ -8,7 +8,10 @@ const UserSchema = new Schema({
   email: { type: String, required: true, unique: true },
   otp: { type: String },
   otpExpiresAt: { type: Date },
+  likedRestaurants: [{ type: String, ref: 'Restaurant' }],
+  dislikedRestaurants: [{ type: String, ref: 'Restaurant' }],
 });
+
 
 UserSchema.methods.generateOTP = async function () {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();

@@ -2,7 +2,7 @@ import { axiosInstance } from './config';
 
 export class Restaurant {
   constructor(id, name, description, location, link, images, pills) {
-    this.id = id;
+    this._id = id;
     this.name = name;
     this.description = description;
     this.location = location;

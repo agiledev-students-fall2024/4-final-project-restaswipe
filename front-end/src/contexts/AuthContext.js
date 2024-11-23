@@ -1,6 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { AccountInfoContext } from "./AccountInfoContext";
-import { fetchUser } from "../api/User";
 
 export const AuthContext = createContext();
 
@@ -21,11 +20,8 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token, setAccountInfo]);
 
-  const login = async (email, jwtToken) => {
+  const login = async (jwtToken) => {
     setToken(jwtToken);
-    // Fetch user info if needed
-    const user = await fetchUser(email);
-    setAccountInfo(user);
   };
 
   const logout = () => {
