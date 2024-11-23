@@ -17,14 +17,13 @@ import { useNavigate } from 'react-router-dom';
 const SwipableFeed = ({ filters, selectedRestaurant }) => {
   const { accountInfo } = useContext(AccountInfoContext);
   const { logout } = useContext(AuthContext);
-  const navigate = useNavigate();
 
   const {
     setFilteredRestaurants,
     filteredRestaurants: restaurants,
     setAllRestaurants,
   } = useContext(SwipableFeedContext);
-
+  const navigate  = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [page, setPage] = useState(1);
   const [isFetching, setIsFetching] = useState(false);

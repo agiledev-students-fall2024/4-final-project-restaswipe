@@ -16,9 +16,8 @@ const jwtVerifyToken = async function (jwt_payload, next) {
   if (expirationDate < new Date()) {
     return next(null, false, { message: 'JWT token has expired.' })
   }
-
   const userId = new ObjectId(jwt_payload.id)
-  const user = await User.findOne({ _id: userId }).exec()
+  const user = await User.findById(userId)
   if (user) {
     next(null, user)
   } else {

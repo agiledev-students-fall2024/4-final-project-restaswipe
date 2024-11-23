@@ -2,11 +2,16 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const sinon = require('sinon');
 const app = require('./app');
+const express = require('express');
+const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const Restaurant = require('./app/models/restaurant');
 const User = require('./app/models/User');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
 const expect = chai.expect;
+const proxyquire = require('proxyquire');
 
 chai.use(chaiHttp);
 
@@ -14,6 +19,10 @@ describe('API Unit Tests with Database Mocking', () => {
   let sandbox;
   let jwtToken;
   let userId;
+  let transportStub;
+  let createTransportStub;
+  let bcryptHashStub;
+  let bcryptCompareStub;
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
@@ -25,6 +34,16 @@ describe('API Unit Tests with Database Mocking', () => {
       process.env.JWT_SECRET || 'test_secret',
       { expiresIn: '1d' }
     );
+    console.log(jwt)
+    // Stub nodemailer.createTransport and sendMail
+    transportStub = {
+      sendMail: sandbox.stub().resolves(),
+    };
+    createTransportStub = sandbox.stub(nodemailer, 'createTransport').returns(transportStub);
+
+    // Stub bcrypt methods
+    bcryptHashStub = sandbox.stub(bcrypt, 'hash').resolves('hashedOTP');
+    bcryptCompareStub = sandbox.stub(bcrypt, 'compare').resolves(true);
   });
 
   afterEach(() => {
@@ -228,17 +247,13 @@ describe('API Unit Tests with Database Mocking', () => {
       };
 
       // Mock Restaurant.findById
-      sandbox.stub(Restaurant, 'findById').returns({
-        exec: sinon.stub().resolves({
-          _id: restaurantId,
-          name: 'Restaurant 1',
-        }),
+      sandbox.stub(Restaurant, 'findById').resolves({
+        _id: restaurantId,
+        name: 'Restaurant 1',
       });
 
       // Mock User.findById
-      sandbox.stub(User, 'findById').returns({
-        exec: sinon.stub().resolves(userStub),
-      });
+      sandbox.stub(User, 'findById').resolves(userStub);
 
       chai
         .request(app)
@@ -266,17 +281,13 @@ describe('API Unit Tests with Database Mocking', () => {
       };
 
       // Mock Restaurant.findById
-      sandbox.stub(Restaurant, 'findById').returns({
-        exec: sinon.stub().resolves({
-          _id: restaurantId,
-          name: 'Restaurant 1',
-        }),
+      sandbox.stub(Restaurant, 'findById').resolves({
+        _id: restaurantId,
+        name: 'Restaurant 1',
       });
 
       // Mock User.findById
-      sandbox.stub(User, 'findById').returns({
-        exec: sinon.stub().resolves(userStub),
-      });
+      sandbox.stub(User, 'findById').resolves(userStub);
 
       chai
         .request(app)
@@ -348,6 +359,258 @@ describe('API Unit Tests with Database Mocking', () => {
         .end((err, res) => {
           expect(res).to.have.status(500);
           expect(res.text).to.equal('Error searching for restaurant');
+          done();
+        });
+    });
+  });
+
+  // New tests for /auth routes
+  describe('POST /auth/request', () => {
+    it('should return 400 if email is missing', (done) => {
+      chai
+        .request(app)
+        .post('/auth/request')
+        .send({})
+        .end((err, res) => {
+          expect(res).to.have.status(400);
+          expect(res.text).to.equal('Email is required');
+          done();
+        });
+    });
+
+    it('should generate OTP and send email when user exists', (done) => {
+      const email = 'test@example.com';
+
+      const userStub = {
+        email,
+        generateOTP: sandbox.stub().resolves('123456'),
+        save: sandbox.stub().resolves(),
+      };
+
+      // Mock User.findOne
+      sandbox.stub(User, 'findOne').resolves(userStub);
+
+      chai
+        .request(app)
+        .post('/auth/request')
+        .send({ email })
+        .end((err, res) => {
+          expect(res).to.have.status(200);
+          expect(res.text).to.equal('OTP sent');
+
+          // Check that generateOTP was called
+          sinon.assert.calledOnce(userStub.generateOTP);
+
+          // Check that sendMail was called
+          sinon.assert.calledOnce(transportStub.sendMail);
+
+          done();
+        });
+    });
+
+    it('should create a new user, generate OTP, and send email when user does not exist', (done) => {
+      const email = 'newuser@example.com';
+
+      // Mock User.findOne to return null
+      sandbox.stub(User, 'findOne').resolves(null);
+
+      // Mock user instance
+      const userStub = {
+        email,
+        generateOTP: sandbox.stub().resolves('123456'),
+        save: sandbox.stub().resolves(),
+      };
+
+      // Stub User constructor
+      const UserStub = sandbox.stub().returns(userStub);
+
+      // Replace the User model with the stub
+      const authRoutes = proxyquire('./app/routes/auth_routes', {
+        '../models/User': UserStub,
+        '../controllers/email_sender': {
+          send_otp_email: async () => {},
+        },
+      });
+
+      // Create an instance of the app using the stubbed authRoutes
+      const testApp = express();
+      testApp.use(bodyParser.json());
+      testApp.use('/auth', authRoutes());
+
+      chai
+        .request(testApp)
+        .post('/auth/request')
+        .send({ email })
+        .end((err, res) => {
+          expect(res).to.have.status(200);
+          expect(res.text).to.equal('OTP sent');
+
+          // Check that generateOTP was called
+          sinon.assert.calledOnce(userStub.generateOTP);
+
+          done();
+        });
+    });
+
+    it('should handle errors in /auth/request', (done) => {
+      const email = 'test@example.com';
+
+      // Mock User.findOne to throw an error
+      sandbox.stub(User, 'findOne').throws(new Error('Simulated error'));
+
+      chai
+        .request(app)
+        .post('/auth/request')
+        .send({ email })
+        .end((err, res) => {
+          expect(res).to.have.status(500);
+          expect(res.text).to.equal('Error generating OTP');
+          done();
+        });
+    });
+  });
+
+  describe('POST /auth/verify', () => {
+    it('should return 400 if email or OTP is missing', (done) => {
+      chai
+        .request(app)
+        .post('/auth/verify')
+        .send({ email: 'test@example.com' })
+        .end((err, res) => {
+          expect(res).to.have.status(400);
+          expect(res.text).to.equal('Email and OTP are required.');
+          done();
+        });
+    });
+
+    it('should return 400 if user not found', (done) => {
+      sandbox.stub(User, 'findOne').resolves(null);
+
+      chai
+        .request(app)
+        .post('/auth/verify')
+        .send({ email: 'test@example.com', otp: '123456' })
+        .end((err, res) => {
+          expect(res).to.have.status(400);
+          expect(res.text).to.equal('User not found');
+          done();
+        });
+    });
+
+    it('should return 400 if OTP is invalid', (done) => {
+      const userStub = {
+        email: 'test@example.com',
+        validateOTP: sandbox.stub().resolves(false),
+      };
+
+      sandbox.stub(User, 'findOne').resolves(userStub);
+
+      chai
+        .request(app)
+        .post('/auth/verify')
+        .send({ email: 'test@example.com', otp: 'wrongotp' })
+        .end((err, res) => {
+          expect(res).to.have.status(400);
+          expect(res.text).to.equal('Invalid or expired OTP');
+          done();
+        });
+    });
+
+    it('should return token if OTP is valid', (done) => {
+      const userStub = {
+        email: 'test@example.com',
+        validateOTP: sandbox.stub().resolves(true),
+        clearOTP: sandbox.stub().resolves(),
+        generateJWT: sandbox.stub().returns('mocktoken'),
+      };
+
+      sandbox.stub(User, 'findOne').resolves(userStub);
+
+      chai
+        .request(app)
+        .post('/auth/verify')
+        .send({ email: 'test@example.com', otp: '123456' })
+        .end((err, res) => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.have.property('message', 'OTP verified');
+          expect(res.body).to.have.property('token', 'mocktoken');
+          done();
+        });
+    });
+
+    it('should handle errors in /auth/verify', (done) => {
+      sandbox.stub(User, 'findOne').throws(new Error('Simulated error'));
+
+      chai
+        .request(app)
+        .post('/auth/verify')
+        .send({ email: 'test@example.com', otp: '123456' })
+        .end((err, res) => {
+          expect(res).to.have.status(500);
+          expect(res.text).to.equal('Error verifying OTP');
+          done();
+        });
+    });
+  });
+
+  describe('GET /user', () => {
+    it('should return the user data', (done) => {
+      const userStub = {
+        _id: userId,
+        email: 'test@example.com',
+        likedRestaurants: [],
+        dislikedRestaurants: [],
+        populate: sandbox.stub().returnsThis(),
+      };
+
+      // Mock User.findById
+      sandbox.stub(User, 'findById').returns({
+        populate: sinon.stub().returns({
+          exec: sinon.stub().resolves(userStub),
+        }),
+      });
+
+      chai
+        .request(app)
+        .get('/user')
+        .set('Authorization', `JWT ${jwtToken}`)
+        .end((err, res) => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.have.property('email', 'test@example.com');
+          done();
+        });
+    });
+
+    it('should return 404 if user not found', (done) => {
+      // Mock User.findById to return null
+      sandbox.stub(User, 'findById').returns({
+        populate: sinon.stub().returns({
+          exec: sinon.stub().resolves(null),
+        }),
+      });
+
+      chai
+        .request(app)
+        .get('/user')
+        .set('Authorization', `JWT ${jwtToken}`)
+        .end((err, res) => {
+          expect(res).to.have.status(404);
+          expect(res.text).to.equal('User not found');
+          done();
+        });
+    });
+
+    it('should handle errors in /user endpoint', (done) => {
+      // Mock User.findById to throw error
+      sandbox.stub(User, 'findById').throws(new Error('Simulated error'));
+
+      chai
+        .request(app)
+        .get('/user')
+        .set('Authorization', `JWT ${jwtToken}`)
+        .end((err, res) => {
+          expect(res).to.have.status(500);
+          expect(res.text).to.match(/Error fetching user:/);
           done();
         });
     });
