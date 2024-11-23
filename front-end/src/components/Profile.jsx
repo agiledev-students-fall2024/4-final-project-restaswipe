@@ -5,6 +5,7 @@ import '../styles/Profile.css';
 import { AccountInfoContext } from '../contexts/AccountInfoContext';
 import { User } from '../api/User';
 import RestaurantListItem from './RestaurantListItem';
+import { fetchUser } from "../api/User";
 
 const ProfilePage = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -13,6 +14,14 @@ const ProfilePage = () => {
   const [filterPrice, setFilterPrice] = useState("All");
   const [filterStatus, setFilterStatus] = useState("All");
   const { accountInfo, setAccountInfo } = useContext(AccountInfoContext);
+
+  useEffect(() => {
+    fetchUser().then((user) => {
+      if (user) {
+        setAccountInfo(user);
+      }
+    });
+  }, [fetchUser]);
 
   const handleDelete = (id) => {
     const confirmed = window.confirm(
@@ -24,38 +33,7 @@ const ProfilePage = () => {
       setAccountInfo((prev) => {new User(prev.id, prev.email, updatedRestaurants)});
     }
   };
-
-  const uniqueCuisines = Array.from(
-    new Set(Object.values(accountInfo.likedRestaurants).map((r) => r.cuisine))
-  );
-  const uniqueNeighborhoods = Array.from(
-    new Set(Object.values(accountInfo.likedRestaurants).map((r) => r.neighborhood))
-  );
-
-  const filteredRestaurants = Object.keys(accountInfo.likedRestaurants).filter((id) => {
-    const restaurant = accountInfo.likedRestaurants[id];
-    const cuisineMatch =
-      filterCuisine === "All" || restaurant.cuisine === filterCuisine;
-    const neighborhoodMatch =
-      filterNeighborhood === "All" ||
-      restaurant.neighborhood === filterNeighborhood;
-    const priceMatch =
-      filterPrice === "All" ||
-      (filterPrice === "$1-15" && restaurant.priceRange <= 15) ||
-      (filterPrice === "$16-25" &&
-        16 >= restaurant.priceRange &&
-        restaurant.priceRange <= 25) ||
-      (filterPrice === "$26-49" &&
-        26 >= restaurant.priceRange &&
-        restaurant.priceRange <= 49) ||
-      (filterPrice === "$50+" && restaurant.priceRange >= 50);
-
-    const statusMatch =
-      filterStatus === "All" || restaurant.status === filterStatus;
-
-    return cuisineMatch && neighborhoodMatch && priceMatch && statusMatch;
-  });
-
+  console.log(accountInfo.likedRestaurants)
   return (
     <div className="profile-page">
       <h1>Profile Page</h1>

@@ -30,7 +30,7 @@ const restaurantRoutes = () => {
       const seenRestaurants = [
         ...(req.user.likedRestaurants || []),
         ...(req.user.dislikedRestaurants || []),
-      ].map((id) => mongoose.Types.ObjectId(id));
+      ];
   
       if (seenRestaurants.length > 0) {
         query._id = { $nin: seenRestaurants };
@@ -79,9 +79,7 @@ const restaurantRoutes = () => {
     const user = req.user;
 
     // Validate restaurantId
-    if (!mongoose.Types.ObjectId.isValid(restaurantId)) {
-      return res.status(400).send('Invalid restaurant ID');
-    }
+   
 
     try {
       const restaurant = await Restaurant.findById(restaurantId);
@@ -110,11 +108,6 @@ const restaurantRoutes = () => {
   router.post('/:id/dislike', authenticate, async (req, res) => {
     const restaurantId = req.params.id;
     const user = req.user;
-
-    // Validate restaurantId
-    if (!mongoose.Types.ObjectId.isValid(restaurantId)) {
-      return res.status(400).send('Invalid restaurant ID');
-    }
 
     try {
       const restaurant = await Restaurant.findById(restaurantId);

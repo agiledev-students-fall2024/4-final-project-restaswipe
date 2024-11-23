@@ -8,8 +8,8 @@ const UserSchema = new Schema({
   email: { type: String, required: true, unique: true },
   otp: { type: String },
   otpExpiresAt: { type: Date },
-  likedRestaurants: [{ type: Schema.Types.ObjectId, ref: 'Restaurant' }],
-  dislikedRestaurants: [{ type: Schema.Types.ObjectId, ref: 'Restaurant' }],
+  likedRestaurants: [{ type: String, ref: 'Restaurant' }],
+  dislikedRestaurants: [{ type: String, ref: 'Restaurant' }],
 });
 
 

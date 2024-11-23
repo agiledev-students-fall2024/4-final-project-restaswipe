@@ -33,7 +33,7 @@ const Login = () => {
     try {
       const response = await axios.post(`${BACKEND_URL}/auth/verify`, { email, otp });
       const { token } = response.data;
-      await login(email, token);
+      await login(token);
       setMessage('Login successful!');
       navigate('/feed');
     } catch (error) {

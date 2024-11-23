@@ -68,7 +68,7 @@ const SwipableFeed = ({ filters, selectedRestaurant }) => {
           const newRestaurants = fetchedRestaurants.filter(
             (newRestaurant) =>
               !prevRestaurants.some(
-                (existingRestaurant) => existingRestaurant.id === newRestaurant.id
+                (existingRestaurant) => existingRestaurant._id === newRestaurant._id
               )
           );
           return [...prevRestaurants, ...newRestaurants];
@@ -78,7 +78,7 @@ const SwipableFeed = ({ filters, selectedRestaurant }) => {
           const newRestaurants = fetchedRestaurants.filter(
             (newRestaurant) =>
               !prevRestaurants.some(
-                (existingRestaurant) => existingRestaurant.id === newRestaurant.id
+                (existingRestaurant) => existingRestaurant._id === newRestaurant._id
               )
           );
           return [...prevRestaurants, ...newRestaurants];
@@ -114,9 +114,9 @@ const SwipableFeed = ({ filters, selectedRestaurant }) => {
   const handleSwipe = (dir, index) => {
     const restaurant = restaurants[index];
     if (dir === 'left') {
-      dislikeRestaurant(restaurant.id);
+      dislikeRestaurant(restaurant._id);
     } else if (dir === 'right') {
-      likeRestaurant(restaurant.id);
+      likeRestaurant(restaurant._id);
     }
     setCurrentIndex((prevIndex) => prevIndex + 1);
 
@@ -133,7 +133,7 @@ const SwipableFeed = ({ filters, selectedRestaurant }) => {
         (restaurant, index) =>
           index <= currentIndex && (
             <SwipeableCard
-              key={restaurant.id}
+              key={restaurant._id}
               index={index}
               currentIndex={currentIndex}
               onSwipeLeft={() => handleSwipe('left', index)}

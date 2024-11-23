@@ -15,11 +15,15 @@ async function backfillRestaurants() {
     console.log(`Deleted ${deleteResult.deletedCount} existing restaurants.`);
 
     // Process data before inserting (e.g., convert fields to lowercase)
-    const processedData = restaurantsData.map((restaurant) => ({
-      ...restaurant,
-      cuisine: restaurant.cuisine ? restaurant.cuisine.toLowerCase() : '',
-      neighborhood: restaurant.neighborhood ? restaurant.neighborhood.toLowerCase() : '',
-    }));
+    const processedData = restaurantsData.map((restaurant) => {
+      const { id, ...rest } = restaurant; // Exclude `id`
+      return {
+        ...rest,
+        cuisine: restaurant.cuisine ? restaurant.cuisine.toLowerCase() : '',
+        neighborhood: restaurant.neighborhood ? restaurant.neighborhood.toLowerCase() : '',
+        _id: restaurant.id, // Use `id` as `_id`
+      };
+    });
 
     // Insert restaurants into the database
     const insertedRestaurants = await Restaurant.insertMany(processedData);
