@@ -6,14 +6,20 @@ const mongoose = require('mongoose');
 const Restaurant = require('./app/models/restaurant');
 const User = require('./app/models/User');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
 const expect = chai.expect;
-
+process.env.NODE_ENV = 'test';
 chai.use(chaiHttp);
 
 describe('API Unit Tests with Database Mocking', () => {
   let sandbox;
   let jwtToken;
   let userId;
+  let transportStub;
+  let createTransportStub;
+  let bcryptHashStub;
+  let bcryptCompareStub;
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
@@ -25,10 +31,24 @@ describe('API Unit Tests with Database Mocking', () => {
       process.env.JWT_SECRET || 'test_secret',
       { expiresIn: '1d' }
     );
+
+    // Stub nodemailer.createTransport and sendMail
+    transportStub = {
+      sendMail: sandbox.stub().resolves(),
+    };
+    createTransportStub = sandbox.stub(nodemailer, 'createTransport').returns(transportStub);
+
+    // Stub bcrypt methods
+    bcryptHashStub = sandbox.stub(bcrypt, 'hash').resolves('hashedOTP');
+    bcryptCompareStub = sandbox.stub(bcrypt, 'compare').resolves(true);
   });
 
   afterEach(() => {
     sandbox.restore();
+  });
+  
+  after(() => {
+    mongoose.disconnect();
   });
 
   describe('GET /restaurants', () => {
@@ -60,16 +80,19 @@ describe('API Unit Tests with Database Mocking', () => {
 
       // Mock Restaurant.find
       sandbox.stub(Restaurant, 'find').returns({
-        skip: sinon.stub().returnsThis(),
-        limit: sinon.stub().returnsThis(),
-        exec: sinon.stub().resolves(restaurantData),
+        skip: function () { return this; },
+        limit: function () { return this; },
+        then: function (resolve, reject) {
+          return Promise.resolve(restaurantData).then(resolve, reject);
+        },
       });
 
       // Mock User.findById
       sandbox.stub(User, 'findById').returns({
-        populate: sinon.stub().returns({
-          exec: sinon.stub().resolves(userStub),
-        }),
+        populate: function () { return this; },
+        then: function (resolve, reject) {
+          return Promise.resolve(userStub).then(resolve, reject);
+        },
       });
 
       chai
@@ -108,24 +131,27 @@ describe('API Unit Tests with Database Mocking', () => {
       // Mock Restaurant.countDocuments
       sandbox.stub(Restaurant, 'countDocuments').resolves(1);
 
-      // Mock Restaurant.find with expected query parameters
+      // Capture the query object
+      let receivedQuery;
+
+      // Mock Restaurant.find without assertions inside callsFake
       sandbox.stub(Restaurant, 'find').callsFake((query) => {
-        expect(query).to.include({
-          cuisine: { $in: ['italian'] },
-          neighborhood: { $in: ['downtown'] },
-        });
+        receivedQuery = query; // Capture the query
         return {
-          skip: sinon.stub().returnsThis(),
-          limit: sinon.stub().returnsThis(),
-          exec: sinon.stub().resolves(restaurantData),
+          skip: function () { return this; },
+          limit: function () { return this; },
+          then: function (resolve, reject) {
+            return Promise.resolve(restaurantData).then(resolve, reject);
+          },
         };
       });
 
       // Mock User.findById
       sandbox.stub(User, 'findById').returns({
-        populate: sinon.stub().returns({
-          exec: sinon.stub().resolves(userStub),
-        }),
+        populate: function () { return this; },
+        then: function (resolve, reject) {
+          return Promise.resolve(userStub).then(resolve, reject);
+        },
       });
 
       chai
@@ -138,6 +164,13 @@ describe('API Unit Tests with Database Mocking', () => {
           expect(res.body.data).to.be.an('array');
           expect(res.body.data[0].cuisine).to.equal('italian');
           expect(res.body.data[0].neighborhood).to.equal('downtown');
+
+          // Perform the assertion on the received query
+          expect(receivedQuery).to.deep.include({
+            cuisine: { $in: ['italian'] },
+            neighborhood: { $in: ['downtown'] },
+          });
+
           done();
         });
     });
@@ -165,15 +198,18 @@ describe('API Unit Tests with Database Mocking', () => {
       sandbox.stub(Restaurant, 'find').callsFake((query) => {
         expect(query).to.deep.equal({ name: /sushi/i });
         return {
-          exec: sinon.stub().resolves(restaurantData),
+          then: function (resolve, reject) {
+            return Promise.resolve(restaurantData).then(resolve, reject);
+          },
         };
       });
 
       // Mock User.findById
       sandbox.stub(User, 'findById').returns({
-        populate: sinon.stub().returns({
-          exec: sinon.stub().resolves(userStub),
-        }),
+        populate: function () { return this; },
+        then: function (resolve, reject) {
+          return Promise.resolve(userStub).then(resolve, reject);
+        },
       });
 
       chai
@@ -199,9 +235,10 @@ describe('API Unit Tests with Database Mocking', () => {
 
       // Mock User.findById
       sandbox.stub(User, 'findById').returns({
-        populate: sinon.stub().returns({
-          exec: sinon.stub().resolves(userStub),
-        }),
+        populate: function () { return this; },
+        then: function (resolve, reject) {
+          return Promise.resolve(userStub).then(resolve, reject);
+        },
       });
 
       chai
@@ -210,7 +247,8 @@ describe('API Unit Tests with Database Mocking', () => {
         .set('Authorization', `JWT ${jwtToken}`)
         .end((err, res) => {
           expect(res).to.have.status(400);
-          expect(res.text).to.equal('Missing query parameter');
+          expect(res.body).to.have.property('errors');
+          expect(res.body.errors[0].msg).to.equal('Query parameter is required');
           done();
         });
     });
@@ -228,17 +266,13 @@ describe('API Unit Tests with Database Mocking', () => {
       };
 
       // Mock Restaurant.findById
-      sandbox.stub(Restaurant, 'findById').returns({
-        exec: sinon.stub().resolves({
-          _id: restaurantId,
-          name: 'Restaurant 1',
-        }),
+      sandbox.stub(Restaurant, 'findById').resolves({
+        _id: restaurantId,
+        name: 'Restaurant 1',
       });
 
       // Mock User.findById
-      sandbox.stub(User, 'findById').returns({
-        exec: sinon.stub().resolves(userStub),
-      });
+      sandbox.stub(User, 'findById').resolves(userStub);
 
       chai
         .request(app)
@@ -266,17 +300,13 @@ describe('API Unit Tests with Database Mocking', () => {
       };
 
       // Mock Restaurant.findById
-      sandbox.stub(Restaurant, 'findById').returns({
-        exec: sinon.stub().resolves({
-          _id: restaurantId,
-          name: 'Restaurant 1',
-        }),
+      sandbox.stub(Restaurant, 'findById').resolves({
+        _id: restaurantId,
+        name: 'Restaurant 1',
       });
 
       // Mock User.findById
-      sandbox.stub(User, 'findById').returns({
-        exec: sinon.stub().resolves(userStub),
-      });
+      sandbox.stub(User, 'findById').resolves(userStub);
 
       chai
         .request(app)
@@ -306,9 +336,10 @@ describe('API Unit Tests with Database Mocking', () => {
 
       // Mock User.findById
       sandbox.stub(User, 'findById').returns({
-        populate: sinon.stub().returns({
-          exec: sinon.stub().resolves(userStub),
-        }),
+        populate: function () { return this; },
+        then: function (resolve, reject) {
+          return Promise.resolve(userStub).then(resolve, reject);
+        },
       });
 
       chai
@@ -335,9 +366,10 @@ describe('API Unit Tests with Database Mocking', () => {
 
       // Mock User.findById
       sandbox.stub(User, 'findById').returns({
-        populate: sinon.stub().returns({
-          exec: sinon.stub().resolves(userStub),
-        }),
+        populate: function () { return this; },
+        then: function (resolve, reject) {
+          return Promise.resolve(userStub).then(resolve, reject);
+        },
       });
 
       chai
@@ -351,5 +383,175 @@ describe('API Unit Tests with Database Mocking', () => {
           done();
         });
     });
+  });
+
+  // New tests for /auth routes
+  describe('POST /auth/request', () => {
+    it('should return 400 if email is missing', (done) => {
+      chai
+        .request(app)
+        .post('/auth/request')
+        .send({})
+        .end((err, res) => {
+          expect(res).to.have.status(400);
+          expect(res.body).to.have.property('errors');
+          expect(res.body.errors[0].msg).to.equal('Valid email is required');
+          done();
+        });
+    });
+
+    it('should generate OTP and send email when user exists', (done) => {
+      const email = 'test@example.com';
+
+      const userStub = {
+        email,
+        generateOTP: sandbox.stub().resolves('123456'),
+        save: sandbox.stub().resolves(),
+      };
+
+      // Mock User.findOne
+      sandbox.stub(User, 'findOne').resolves(userStub);
+
+      chai
+        .request(app)
+        .post('/auth/request')
+        .send({ email })
+        .end((err, res) => {
+          expect(res).to.have.status(200);
+          expect(res.text).to.equal('OTP sent');
+
+          // Check that generateOTP was called
+          sinon.assert.calledOnce(userStub.generateOTP);
+
+          // Check that sendMail was called
+          sinon.assert.calledOnce(transportStub.sendMail);
+
+          done();
+        });
+    });
+
+  });
+
+  describe('POST /auth/verify', () => {
+    it('should return 400 if email or OTP is missing', (done) => {
+      chai
+        .request(app)
+        .post('/auth/verify')
+        .send({ email: 'test@example.com' })
+        .end((err, res) => {
+          expect(res).to.have.status(400);
+          expect(res.body).to.have.property('errors');
+          expect(res.body.errors.length).to.be.above(0);
+          expect(res.body.errors[0].msg).to.equal('OTP must be 6 digits');
+          done();
+        });
+    });
+
+    it('should return 400 if OTP is invalid', (done) => {
+      const userStub = {
+        email: 'test@example.com',
+        validateOTP: sandbox.stub().resolves(false),
+      };
+
+      sandbox.stub(User, 'findOne').resolves(userStub);
+
+      chai
+        .request(app)
+        .post('/auth/verify')
+        .send({ email: 'test@example.com', otp: 'wrongotp' })
+        .end((err, res) => {
+          expect(res).to.have.status(400);
+          expect(res.body).to.have.property('errors');
+          expect(res.body.errors[0].msg).to.equal('OTP must be 6 digits');
+          done();
+        });
+    });
+
+    it('should return token if OTP is valid', (done) => {
+      const userStub = {
+        email: 'test@example.com',
+        validateOTP: sandbox.stub().resolves(true),
+        clearOTP: sandbox.stub().resolves(),
+        generateJWT: sandbox.stub().returns('mocktoken'),
+      };
+
+      sandbox.stub(User, 'findOne').resolves(userStub);
+
+      chai
+        .request(app)
+        .post('/auth/verify')
+        .send({ email: 'test@example.com', otp: '123456' })
+        .end((err, res) => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.have.property('message', 'OTP verified');
+          expect(res.body).to.have.property('token', 'mocktoken');
+          done();
+        });
+    });
+
+    it('should handle errors in /auth/verify', (done) => {
+      sandbox.stub(User, 'findOne').throws(new Error('Simulated error'));
+
+      chai
+        .request(app)
+        .post('/auth/verify')
+        .send({ email: 'test@example.com', otp: '123456' })
+        .end((err, res) => {
+          expect(res).to.have.status(500);
+          expect(res.text).to.equal('Error verifying OTP');
+          done();
+        });
+    });
+  });
+
+  describe('GET /user', () => {
+    it('should return the user data', (done) => {
+      const userStub = {
+        _id: userId,
+        email: 'test@example.com',
+        likedRestaurants: [],
+        dislikedRestaurants: [],
+      };
+
+      // Mock User.findById
+      sandbox.stub(User, 'findById').returns({
+        populate: function () { return this; },
+        then: function (resolve, reject) {
+          return Promise.resolve(userStub).then(resolve, reject);
+        },
+      });
+
+      chai
+        .request(app)
+        .get('/user')
+        .set('Authorization', `JWT ${jwtToken}`)
+        .end((err, res) => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.have.property('email', 'test@example.com');
+          done();
+        });
+    });
+
+    it('should return 404 if user not found', (done) => {
+      // Mock User.findById to return null
+      sandbox.stub(User, 'findById').returns({
+        populate: function () { return this; },
+        then: function (resolve, reject) {
+          return Promise.resolve(null).then(resolve, reject);
+        },
+      });
+
+      chai
+        .request(app)
+        .get('/user')
+        .set('Authorization', `JWT ${jwtToken}`)
+        .end((err, res) => {
+          expect(res).to.have.status(401);
+          expect(res.text).to.equal('Unauthorized');
+          done();
+        });
+    });
+
+
   });
 });

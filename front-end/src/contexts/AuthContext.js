@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token, setAccountInfo]);
 
-  const login = async (jwtToken) => {
+  const login = (jwtToken) => {
     setToken(jwtToken);
   };
 

@@ -71,4 +71,4 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 
 # Instructions
-* `npm install` and then `npm start`. You'll need to add `REACT_APP_API_KEY="VALUE"` to a .env in the front-end directory. See Discord team channel for the correct value.
+* `npm install` and then `npm start`. See Discord team channel for correct .env values.

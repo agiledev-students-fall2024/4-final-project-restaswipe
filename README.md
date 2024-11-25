@@ -20,5 +20,6 @@ Several sets of instructions are included in this repository. They should each b
 
 
 # Instructions
-* back-end: `npm install` and then `npm start`
-* front-end `npm install` and then `npm start`. You'll need to add `REACT_APP_API_KEY="VALUE"` to a .env in the front-end directory. See Discord team channel for the correct value.
+* back-end: `npm install` and then `npm start`. You'll need to add .env file in the back-end directory. See Discord team channel for the correct values.
+* front-end `npm install` and then `npm start`. You'll need to add .env file in the front-end directory. See Discord team channel for the correct values.
+* When running, you should recieve a real OTP value to the inputted email address from restaswipe@gmail.com.
