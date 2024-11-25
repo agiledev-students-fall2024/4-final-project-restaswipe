@@ -13,7 +13,11 @@ const AppRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
+      <Route path="/login" element={isAuthenticated ? (
+            <Navigate to="/feed" replace />
+          ) : (
+            <Login/>
+          )} />
       <Route
         path="/"
         element={

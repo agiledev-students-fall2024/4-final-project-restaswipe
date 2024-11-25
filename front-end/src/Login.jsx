@@ -35,6 +35,7 @@ const Login = () => {
       const { token } = response.data;
       login(token);
       navigate('/feed');
+      window.location.href = '/feed';
     } catch (error) {
       console.error(error);
       setMessage('Invalid OTP.');
