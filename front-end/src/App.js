@@ -11,21 +11,24 @@ import { AccountInfoProvider } from "./contexts/AccountInfoContext";
 import { SwipableFeedProvider } from "./contexts/SwipableFeedContext";
 import { SelectedRestaurantProvider } from "./contexts/SelectedRestaurantContext";
 import "./App.css";
+ // import { LocationProvider } from "./contexts/LocationContext"; // TODO
 
 
 function App() {
   return (
-    <AccountInfoProvider>
-      <AuthProvider>
-        <SwipableFeedProvider>
-          <SelectedRestaurantProvider>
-            <Router>
-              <AppRoutes />
-            </Router>
-          </SelectedRestaurantProvider>
-        </SwipableFeedProvider>
-      </AuthProvider>
-    </AccountInfoProvider>
+    // <LocationProvider> // TODO
+      <AccountInfoProvider>
+        <AuthProvider>
+          <SwipableFeedProvider>
+            <SelectedRestaurantProvider>
+              <Router>
+                <AppRoutes />
+              </Router>
+            </SelectedRestaurantProvider>
+          </SwipableFeedProvider>
+        </AuthProvider>
+      </AccountInfoProvider>
+    // </LocationProvider>
   );
 }
 

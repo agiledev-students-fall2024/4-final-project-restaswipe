@@ -1,3 +1,7 @@
+body {
+  padding-top: 60px;
+}
+
 .profile-page {
   max-width: 1200px;
   margin: 0 auto;
@@ -118,4 +122,19 @@
 .filter-button.active {
   background-color: #007bff;
   color: white;
+}
+
+.settings-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-top: 20px;
+}
+
+.settings-button:hover {
+  background-color: #0056b3;
 }

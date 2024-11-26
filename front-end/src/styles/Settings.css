@@ -1,0 +1,115 @@
+body {
+  padding-top: 60px;
+}
+
+.settings-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.settings-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 24px;
+}
+
+.settings-subtitle {
+  margin: 0 0 16px 0;
+  color: #1a1a1a;
+  font-size: 28px;
+}
+
+.profile-details {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.profile-email {
+  flex: 1;
+  font-size: 16px;
+  color: #666;
+}
+
+.edit-profile-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 20px;
+  background-color: #e9ecef;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-profile-button:hover {
+  background-color: #dee2e6;
+}
+
+.further-functionality {
+  background-color: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.expansion-message {
+  color: #666;
+  font-size: 16px;
+}
+
+.routing {
+  display: flex;
+}
+
+.profile-reroute {
+  margin-top: 20px;
+}
+
+.profile-button {
+  padding: 10px 20px;
+  margin-right: 5px;
+  border: none;
+  border-radius: 20px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.profile-button:hover {
+  background-color: #0056b3;
+}
+
+.settings-logout {
+  margin-top: 20px;
+}
+
+.logout-button {
+  padding: 10px 20px;
+  margin-left: 5px;
+  border: none;
+  border-radius: 20px;
+  background-color: rgb(230, 37, 37);
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.logout-button:hover {
+  background-color: rgb(197, 32, 32);
+}
+
+.error-message {
+  color: red;
+  margin-top: 20px;
+}
