@@ -5,6 +5,7 @@ import ProfilePage from "./components/Profile";
 import Login from "./Login";
 import { AuthContext } from "./contexts/AuthContext";
 import Navbar from "./components/Navbar";
+import Settings from "./components/Settings";
 
 const AppRoutes = () => {
   const { isAuthenticated } = useContext(AuthContext);
@@ -48,6 +49,19 @@ const AppRoutes = () => {
             <>
               <Navbar />
               <ProfilePage />
+            </>
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+      <Route
+        path='/settings'
+        element={
+          isAuthenticated ? (
+            <>
+              <Navbar/>
+              <Settings/>
             </>
           ) : (
             <Navigate to="/login" replace />

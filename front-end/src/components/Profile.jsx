@@ -6,6 +6,7 @@ import { AccountInfoContext } from '../contexts/AccountInfoContext';
 import { User } from '../api/User';
 import RestaurantListItem from './RestaurantListItem';
 import { fetchUser } from "../api/User";
+import { useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -14,6 +15,7 @@ const ProfilePage = () => {
   const [filterPrice, setFilterPrice] = useState("All");
   const [filterStatus, setFilterStatus] = useState("All");
   const { accountInfo, setAccountInfo } = useContext(AccountInfoContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchUser().then((user) => {
@@ -33,6 +35,11 @@ const ProfilePage = () => {
       setAccountInfo((prev) => {new User(prev.id, prev.email, updatedRestaurants)});
     }
   };
+
+  const handleGoToSettings = () => {
+    navigate('/settings');
+  };
+
   console.log(accountInfo.likedRestaurants)
   return (
     <div className="profile-page">
@@ -66,6 +73,10 @@ const ProfilePage = () => {
           You haven't liked any restaurants yet.
         </p>
       )}
+
+      <button className="settings-button" onClick={handleGoToSettings}>
+        Go to Settings
+      </button>
     </div>
   );
 };

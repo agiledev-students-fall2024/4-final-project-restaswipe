@@ -12,11 +12,13 @@ import { SwipableFeedContext } from '../contexts/SwipableFeedContext';
 import { AccountInfoContext } from '../contexts/AccountInfoContext';
 import { AuthContext } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+// import { useLocationContext } from '../contexts/LocationContext'; // TODO implmement this
 
 
 const SwipableFeed = ({ filters, selectedRestaurant }) => {
   const { accountInfo } = useContext(AccountInfoContext);
   const { logout } = useContext(AuthContext);
+   // const { searchRadius, location } = useLocationContext(); // TODO
 
   const {
     setFilteredRestaurants,
@@ -31,10 +33,10 @@ const SwipableFeed = ({ filters, selectedRestaurant }) => {
   console.log(restaurants, currentIndex);
   // Fetch data when accountInfo, page, or filters change
   useEffect(() => {
-    if (!accountInfo) return;
+    if (!accountInfo) return; // add in `|| !location` as a parameter for the if statement, once the reverse geocoding api is implemented
     fetchRestaurants(page);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accountInfo]);
+  }, [accountInfo]); // TODO add location as a parameter once reverse geocode api is implemented
 
   useEffect(() => {
     setPage(1);
@@ -57,6 +59,9 @@ const SwipableFeed = ({ filters, selectedRestaurant }) => {
         limit: 20,
         neighborhood: filters.neighborhoods ? filters.neighborhoods.join(',') : '',
         cuisine: filters.cuisines ? filters.cuisines.join(',') : '',
+        //latitude: location?.lat,
+        //longitude: location?.lng, // TODO add these three parameters back in once reverse geocode api is implemented
+        //radius: searchRadius,
       });
       const fetchedRestaurants = response.restaurants;
       if (fetchedRestaurants.length === 0) {
