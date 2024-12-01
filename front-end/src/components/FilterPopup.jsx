@@ -25,6 +25,7 @@ const FilterPopup = ({ open, close, onApplyFilters, onSelectRestaurant }) => {
   const [selectedNeighborhoods, setSelectedNeighborhoods] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [filterSearch, setFilterSearch] = useState("");
 
   const handleSearchChange = async (event) => {
     const value = event.target.value;
@@ -46,21 +47,34 @@ const FilterPopup = ({ open, close, onApplyFilters, onSelectRestaurant }) => {
     }
   };
 
-  const handleCuisineChange = (event) => {
-    const value = event.target.value;
-    setSelectedCuisines(
-      selectedCuisines.includes(value)
-        ? selectedCuisines.filter((cuisine) => cuisine !== value)
-        : [...selectedCuisines, value]
+  const handleSelectCuisine = (cuisine) => {
+    setSelectedCuisines((prev) =>
+      prev.includes(cuisine) ? prev.filter((item) => item !== cuisine) : [...prev, cuisine]
     );
+  }
+
+  const handleSelectNeighborgood = (neighborhood) => {
+    setSelectedNeighborhoods((prev) =>
+      prev.includes(neighborhood) ? prev.filter((item) => item !== neighborhood) : [...prev, neighborhood]
+    );
+
   };
 
-  const handleNeighborhoodChange = (event) => {
-    const value = event.target.value;
-    setSelectedNeighborhoods(
-      selectedNeighborhoods.includes(value)
-        ? selectedNeighborhoods.filter((neighborhood) => neighborhood !== value)
-        : [...selectedNeighborhoods, value]
+  const removeFilter = (type, value) => {
+    if (type === "cuisine") {
+      setSelectedCuisines((prev) => prev.filter((item) => item !== value));
+    } else if (type === "neighborhood") {
+      setSelectedNeighborhoods((prev) => prev.filter((item) => item !== value));
+    }
+  };
+
+  const getFilteredOptions = () => {
+    const lowerCaseSearch = filterSearch.toLowerCase();
+    const allOptions = [...cuisines, ...neighborhoods];
+    return allOptions.filter(
+      (option) =>
+        option.toLowerCase().includes(lowerCaseSearch) &&
+        ![...selectedCuisines, ...selectedNeighborhoods].includes(option)
     );
   };
 
@@ -74,6 +88,13 @@ const FilterPopup = ({ open, close, onApplyFilters, onSelectRestaurant }) => {
       console.error('Error fetching restaurant details:', error);
     }
   };
+
+  const reorderList = (list, selectedItems) => {
+    const selected = list.filter((item) => selectedItems.includes(item));
+    const unselected = list.filter((item) => !selectedItems.includes(item));
+    return [...selected, ...unselected];
+  };
+
 
   const handleOverlayClick = () => {
     setSearch('');
@@ -94,7 +115,7 @@ const FilterPopup = ({ open, close, onApplyFilters, onSelectRestaurant }) => {
   return (
     <div className="modal-overlay" onClick={handleOverlayClick}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <h2>Search/Filter Restaurants</h2>
+        <h2>Search by Name</h2>
         <div className="dialog-content">
           <input
             type="text"
@@ -120,40 +141,84 @@ const FilterPopup = ({ open, close, onApplyFilters, onSelectRestaurant }) => {
           {searchResults.length === 0 && search && !isSearching && (
             <div className="no-results">No restaurants found.</div>
           )}
+      <h2>Search by Tag</h2>
+        <div className="pill-slider">
+          {[...selectedCuisines, ...selectedNeighborhoods].map((pill, index) => (
+            <div key={index} className="filter-pill">
+              {pill} <button onClick={() => removeFilter("cuisine", pill)}>x</button>
+            </div>
+          ))}
+        </div>
+        <div className="search-bar-container">
+          <input
+            type="text"
+            placeholder="Search filters..."
+            className="filter-search-bar"
+            value={filterSearch}
+            onChange={(e) => setFilterSearch(e.target.value)}
+          />
+          {filterSearch && (
+            <button className="clear-search-button" onClick={() => setFilterSearch("")}>
+              x
+            </button>
+          )}
+        </div>
+        {filterSearch && (
+          <ul className="filter-dropdown">
+            {getFilteredOptions().map((option, index) => (
+              <li
+                key={index}
+                className="filter-dropdown-item"
+                onClick={() =>
+                  {
+                    if (option === "cusine") {
+                      handleSelectCuisine(option);
+                    } else {
+                      handleSelectNeighborgood(option);
+                    }
+                  }
+                }
+              >
+                {option}
+              </li>
+            ))}
+          </ul>
+        )}
 
           <div className="filter-section">
             <h3>Cuisines</h3>
-            <div className="checkbox-group">
-              {cuisines.map((cuisine) => (
-                <label key={cuisine}>
-                  <input
-                    type="checkbox"
-                    value={cuisine}
-                    checked={selectedCuisines.includes(cuisine)}
-                    onChange={handleCuisineChange}
-                  />
+            <div className="options-slider">
+              {reorderList(cuisines, selectedCuisines).map((cuisine) => (
+                <div
+                  key={cuisine}
+                  className={`filter-option ${
+                    selectedCuisines.includes(cuisine) ? "selected" : ""
+                  }`}
+                  onClick={() => handleSelectCuisine(cuisine)}
+                >
                   {cuisine}
-                </label>
+                </div>
               ))}
             </div>
           </div>
 
           <div className="filter-section">
             <h3>Neighborhoods</h3>
-            <div className="checkbox-group">
-              {neighborhoods.map((neighborhood) => (
-                <label key={neighborhood}>
-                  <input
-                    type="checkbox"
-                    value={neighborhood}
-                    checked={selectedNeighborhoods.includes(neighborhood)}
-                    onChange={handleNeighborhoodChange}
-                  />
+            <div className="options-slider">
+              {reorderList(neighborhoods, selectedNeighborhoods).map((neighborhood) => (
+                <div
+                  key={neighborhood}
+                  className={`filter-option ${
+                    selectedNeighborhoods.includes(neighborhood) ? "selected" : ""
+                  }`}
+                  onClick={() => handleSelectNeighborgood(neighborhood)}
+                >
                   {neighborhood}
-                </label>
+                </div>
               ))}
             </div>
           </div>
+
         </div>
         <div className="dialog-actions">
           <button onClick={handleApplyFilters} className="apply-button">

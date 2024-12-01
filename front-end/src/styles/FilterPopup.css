@@ -70,3 +70,147 @@
   padding: 8px 16px;
   cursor: pointer;
 }
+
+.selected-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.filter-pill {
+  display: flex;
+  align-items: center;
+  background-color: #e0e0e0;
+  padding: 4px 8px;
+  margin-bottom: 10px;
+  border-radius: 16px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.filter-pill button {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: grey;
+}
+
+.filter-section {
+  margin-top: 16px;
+}
+
+.options-slider {
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  margin: 1rem;
+}
+
+.filter-option {
+  background-color: #f0f0f0;
+  padding: 4px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-bottom: 1rem;
+  white-space: nowrap;
+}
+
+.filter-option.selected {
+  background-color: #007bff;
+  color: white;
+  white-space: nowrap;
+}
+
+
+.clear-search-button {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #999;
+}
+
+.clear-search-button:hover {
+  color: #333;
+}
+
+.apply-button {
+  align-items: center;
+  background-color: #007bff;
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+}
+
+.close-button {
+  align-items: center;
+  color: #ffffff;
+  background-color: #dc3545;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+}
+
+.pill-slider {
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  scrollbar-width: thin;
+}
+
+.pill-slider::-webkit-scrollbar {
+  height: 6px;
+}
+
+.pill-slider::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 3px;
+}
+
+.filter-search-bar {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.filter-dropdown {
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  position: absolute;
+  width: 100%;
+  z-index: 1000;
+}
+
+.filter-dropdown-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.filter-dropdown-item:hover {
+  background-color: #f0f0f0;
+}
+
+.search-bar-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
