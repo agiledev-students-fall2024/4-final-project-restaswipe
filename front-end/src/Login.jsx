@@ -3,6 +3,7 @@ import { AuthContext } from './contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { BACKEND_URL } from './api/config';
+import "../src/styles/Login.css";
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -43,7 +44,9 @@ const Login = () => {
   };
 
   return (
-    <div style={{ textAlign: 'center', paddingTop: '50px' }}>
+    <div className="login" style={{ textAlign: 'center', paddingTop: '50px' }}>
+      <h1>Restaswipe</h1>
+      <h3>Tinder but for restaurants</h3>
       <h2>Login with OTP</h2>
 
       {!showOtpInput ? (
