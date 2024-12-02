@@ -61,6 +61,8 @@ const FilterPopup = ({ open, close, onApplyFilters, onSelectRestaurant }) => {
   };
 
   const removeFilter = (type, value) => {
+    console.log(type, value)
+    console.log(selectedCuisines, selectedNeighborhoods)
     if (type === "cuisine") {
       setSelectedCuisines((prev) => prev.filter((item) => item !== value));
     } else if (type === "neighborhood") {
@@ -143,9 +145,14 @@ const FilterPopup = ({ open, close, onApplyFilters, onSelectRestaurant }) => {
           )}
       <h2>Search by Tag</h2>
         <div className="pill-slider">
-          {[...selectedCuisines, ...selectedNeighborhoods].map((pill, index) => (
+          {selectedCuisines.map((pill, index) => (
             <div key={index} className="filter-pill">
               {pill} <button onClick={() => removeFilter("cuisine", pill)}>x</button>
+            </div>
+          ))}
+          {selectedNeighborhoods.map((pill, index) => (
+            <div key={index} className="filter-pill">
+              {pill} <button onClick={() => removeFilter("neighborhood", pill)}>x</button>
             </div>
           ))}
         </div>
