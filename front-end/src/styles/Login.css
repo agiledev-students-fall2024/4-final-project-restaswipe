@@ -1,10 +1,9 @@
 /* General Styles */
-body {
+.login {
     font-family: 'Arial', sans-serif;
-    background: linear-gradient(120deg, #f6d365, #fda085);
+    background: #ffffff;
     margin: 0;
     padding: 0;
-    display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
@@ -21,17 +20,26 @@ body {
     text-align: center;
 }
 
-h1 {
-    font-size: 24px;
-    margin-bottom: 20px;
-    color: #555;
+.login h1 {
+  font-size: 50px;
+  margin-bottom: 20px;
+  color: #555;
 }
 
+.login h3 {
+  font-size: 16px;
+  color: #adadad;
+}
+
+.login h2 {
+  font-size: 20px;
+  color: #000000;
+}
 /* Input Fields */
 input[type="email"],
 input[type="text"],
 input[type="number"] {
-    width: 100%;
+    width: 90%;
     padding: 12px;
     margin: 10px 0;
     border: 1px solid #ddd;
@@ -44,26 +52,24 @@ input[type="number"] {
 input[type="email"]:focus,
 input[type="text"]:focus,
 input[type="number"]:focus {
-    border-color: #fda085;
-    box-shadow: 0px 0px 4px rgba(253, 160, 133, 0.8);
+    border-color: #007bff;
+    box-shadow: 0px 0px 4px rgba(0, 123, 255, 0.8);
 }
 
 /* Button */
 button {
-    width: 100%;
-    padding: 12px;
-    background-color: #fda085;
-    color: #fff;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 10px;
+  align-items: center;
+  background-color: #007bff;
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: none;
+  font-size: 20px;
 }
 
 button:hover {
-    background-color: #f6d365;
+  background-color: #007bff;
+  cursor: pointer;
 }
 
 /* Error or Success Messages */
@@ -86,8 +92,8 @@ button:hover {
         padding: 20px;
     }
 
-    h1 {
-        font-size: 20px;
+    .login h1 {
+        font-size: 50px;
     }
 
     button {
