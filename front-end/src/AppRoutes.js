@@ -34,8 +34,8 @@ const AppRoutes = () => {
         element={
           isAuthenticated ? (
             <>
-              <Navbar setFilters={setFilters} setSelectedRestaurant={setSelectedRestaurant} />
-              <SwipableFeed filters={filters} selectedRestaurant={selectedRestaurant} />
+              <Navbar setFilters={setFilters} setSelectedRestaurant={setSelectedRestaurant} filters={filters}/>
+              <SwipableFeed filters={filters} selectedRestaurant={selectedRestaurant} setFilters={setFilters}/>
             </>
           ) : (
             <Navigate to="/login" replace />

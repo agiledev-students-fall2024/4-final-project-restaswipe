@@ -4,7 +4,7 @@ import "../styles/Navbar.css";
 import { AuthContext } from "../contexts/AuthContext";
 import FilterPopup from "./FilterPopup";
 
-const Navbar = ({ setFilters, setSelectedRestaurant }) => {
+const Navbar = ({ setFilters, setSelectedRestaurant, filters }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated } = useContext(AuthContext);
@@ -60,6 +60,7 @@ const Navbar = ({ setFilters, setSelectedRestaurant }) => {
           close={() => setFilterOpen(false)}
           onSelectRestaurant={handleSelectRestaurant}
           onApplyFilters={handleApplyFilters}
+          filters={filters}
         />
       )}
     </>
