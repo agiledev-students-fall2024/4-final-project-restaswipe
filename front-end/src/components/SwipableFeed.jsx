@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 // import { useLocationContext } from '../contexts/LocationContext'; // TODO implmement this
 
 
-const SwipableFeed = ({ filters, selectedRestaurant }) => {
+const SwipableFeed = ({ filters, selectedRestaurant, setFilters }) => {
   const { accountInfo } = useContext(AccountInfoContext);
   const { logout } = useContext(AuthContext);
    // const { searchRadius, location } = useLocationContext(); // TODO
@@ -130,7 +130,6 @@ const SwipableFeed = ({ filters, selectedRestaurant }) => {
       fetchRestaurants(newPage);
     }
   };
-
   return (
     <div className="swipable-feed">
       {restaurants.map(
@@ -148,8 +147,8 @@ const SwipableFeed = ({ filters, selectedRestaurant }) => {
           )
       )}
       {isFetching && <div className="loading">Loading more restaurants...</div>}
-      {!hasMore && currentIndex < 0 && (
-        <div className="no-more-restaurants">No more restaurants</div>
+      {!hasMore && (
+        <div className="no-more-restaurants">No more restaurants fit this criteria. <span onClick={() => setFilters({cuisines: [], neighborhoods: []})} style={{textDecoration:"underline", cursor: "pointer"}}>Try clearing filters.</span></div>
       )}
     </div>
   );

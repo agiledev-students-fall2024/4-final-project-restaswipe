@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../styles/FilterPopup.css';
 import { searchRestaurants } from '../api/Restaurant';
 
@@ -19,7 +19,7 @@ const neighborhoods = [
   "Washington Heights", "West Village"
 ];
 
-const FilterPopup = ({ open, close, onApplyFilters, onSelectRestaurant }) => {
+const FilterPopup = ({ open, close, onApplyFilters, onSelectRestaurant, filters }) => {
   const [search, setSearch] = useState('');
   const [selectedCuisines, setSelectedCuisines] = useState([]);
   const [selectedNeighborhoods, setSelectedNeighborhoods] = useState([]);
@@ -103,6 +103,11 @@ const FilterPopup = ({ open, close, onApplyFilters, onSelectRestaurant }) => {
     setSearchResults([]);
     close();
   };
+
+  useEffect(() => {
+    if(!filters?.cuisines?.length) setSelectedCuisines([]);
+    if(!filters?.neighborhoods?.length) setSelectedNeighborhoods([]);
+  }, [filters])
 
   const handleApplyFilters = () => {
     onApplyFilters({
