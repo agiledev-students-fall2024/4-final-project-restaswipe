@@ -20,29 +20,37 @@
 .restaurant-name {
   font-size: 20px;
   font-weight: 600;
-  /* color: #1a1a1a; */
   margin: 0 0 12px 0;
 }
 
-.pills-container {
+.info-boxes {
   display: flex;
-  flex-wrap: wrap;
   gap: 8px;
+  margin-bottom: 12px;
+}
+
+.info-box {
+  background-color: #e9ecef;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #495057;
+}
+
+.images-container {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
   margin-bottom: 16px;
 }
 
-.pill {
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 500;
-  background-color: #e9ecef;
-  color: #495057;
-  transition: all 0.2s ease;
-}
-
-.pill:hover {
-  background-color: #dee2e6;
+.thumbnail {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #ccc;
 }
 
 .button-container {
@@ -51,7 +59,7 @@
   margin-top: 16px;
 }
 
-.delete-button, 
+.delete-button,
 .status-button {
   padding: 8px 16px;
   border: none;
@@ -69,7 +77,6 @@
 
 .delete-button:hover {
   background-color: #c82333;
-
 }
 
 .status-button {
