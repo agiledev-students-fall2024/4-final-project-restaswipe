@@ -39,13 +39,10 @@ const Settings = () => {
         <h2 className="settings-subtitle">Profile Information</h2>
         <div className="profile-details">
           <p className="profile-email">Email: {accountInfo?.email}</p>
-          <button className="edit-profile-button"> Edit Profile (WIP)</button>
         </div>
       </section>
 
-      <section className="further-functionality">
-        <p className="expansion-message">Settings Page Expansion in Progress...</p>
-      </section>
+    
 
       <div className="routing">
         <section className="profile-reroute">

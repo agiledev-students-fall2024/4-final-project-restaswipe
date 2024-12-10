@@ -1,65 +1,54 @@
 /*eslint-disable no-unused-vars */
-
-import React, {useState, useEffect, useContext} from 'react';
+import React, { useState } from 'react';
 import '../styles/RestaurantListItem.css';
 
 const RestaurantListItem = ({ restaurant, onDelete }) => {
-  const [popupVisible, setPopupVisible] = useState(false);
-  const [status, setStatus] = useState(restaurant.status || "Want to Visit");
-  
+
   if (!restaurant) return <div>No Restaurant Found</div>;
 
   const handleDelete = () => {
     const confirmed = window.confirm(
       "Are you sure that you want to delete this restaurant?"
     );
-    if(confirmed) {
+    if (confirmed) {
       onDelete(restaurant);
     }
-  };
-
-  const handleStatus = () => {
-    setPopupVisible(true);
-  };
-
-  const selectStatus = (newStatus) => {
-    setStatus(newStatus);
-    setPopupVisible(false);
   };
 
 
   return (
     <div className="restaurant-list-item">
       <h2 className="restaurant-name">{restaurant.name}</h2>
-      <div className="pills-container">
-      <div className="pills-container">
-        {restaurant.cuisine && 
-        <span className="pill">
-        {restaurant.cuisine}
-        </span>
-        }
-            <span className="pill">
-              {restaurant.neighborhood}
-            </span>
-        </div>
-        <span className="pill">
-          {status}
-        </span>
+      
+      {/* Display cuisine and neighborhood in small boxes */}
+      <div className="info-boxes">
+        {restaurant.cuisine && (
+          <div className="info-box">{restaurant.cuisine}</div>
+        )}
+        {restaurant.neighborhood && (
+          <div className="info-box">{restaurant.neighborhood}</div>
+        )}
       </div>
-      <div className="button-container">
-        <button className="delete-button" onClick={handleDelete}>Delete</button>
-        <button className="status-button" onClick={handleStatus}>Change Status</button>
-      </div>
-      {popupVisible && (
-        <div className="popup-screen">
-          <div className="popup">
-            <h3>Select Visiting Status</h3>
-            <button onClick={() => selectStatus('Want to Visit')}>Want to Visit</button>
-            <button onClick={() => selectStatus('Previously Visited')}>Previously Visited</button>
-            <button onClick={() => setPopupVisible(false)}>Cancel</button>
-          </div>
+
+      {/* Display images in small thumbnail boxes */}
+      {restaurant.images && restaurant.images.length > 0 && (
+        <div className="images-container">
+          {restaurant.images.map((image, index) => (
+            <img 
+              key={index} 
+              src={image} 
+              alt={`${restaurant.name} image ${index + 1}`} 
+              className="thumbnail" 
+            />
+          ))}
         </div>
       )}
+
+      <div className="button-container">
+        <button className="delete-button" onClick={handleDelete}>Delete</button>
+      </div>
+      
+    
     </div>
   );
 };

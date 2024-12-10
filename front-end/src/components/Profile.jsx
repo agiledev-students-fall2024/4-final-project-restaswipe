@@ -7,13 +7,8 @@ import { User } from '../api/User';
 import RestaurantListItem from './RestaurantListItem';
 import { fetchUser } from "../api/User";
 import { useNavigate } from 'react-router-dom';
-
+import { dislikeRestaurant } from '../api/Restaurant';
 const ProfilePage = () => {
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [filterCuisine, setFilterCuisine] = useState("All");
-  const [filterNeighborhood, setFilterNeighborhood] = useState("All");
-  const [filterPrice, setFilterPrice] = useState("All");
-  const [filterStatus, setFilterStatus] = useState("All");
   const { accountInfo, setAccountInfo } = useContext(AccountInfoContext);
   const navigate = useNavigate();
 
@@ -25,25 +20,26 @@ const ProfilePage = () => {
     });
   }, [fetchUser]);
 
-  const handleDelete = (id) => {
-    const confirmed = window.confirm(
-      "Are you sure that you want to delete this restaurant?"
-    );
-    if (confirmed) {
-      const updatedRestaurants = { ...accountInfo.likedRestaurants };
-      delete updatedRestaurants[id];
-      setAccountInfo((prev) => {new User(prev.id, prev.email, updatedRestaurants)});
-    }
+  const handleDelete = async (id) => {
+      try {
+        await dislikeRestaurant(id);
+      } catch (error) {
+        console.error(`Error disliking restaurant ${id}:`, error);
+      }
+      const updatedRestaurants = accountInfo.likedRestaurants.filter((restaurant) => restaurant._id !== id);
+      setAccountInfo((prev) => new User(prev.id, prev.email, prev.profilePic, updatedRestaurants));
+    
   };
+
 
   const handleGoToSettings = () => {
     navigate('/settings');
   };
 
-  console.log(accountInfo.likedRestaurants)
   return (
     <div className="profile-page">
       <h1>Profile Page</h1>
+      
       <div className="profile-card">
         <div className="profile-photo">
           <img
@@ -54,10 +50,11 @@ const ProfilePage = () => {
         </div>
         <div className="profile-info">
           <h2 className="profile-name">{accountInfo.email || "User's Name"}</h2>
-          <p className="profile-phone">{phoneNumber || "Phone Yet to be Set"}</p>
         </div>
       </div>
-  
+      <button className="settings-button" onClick={handleGoToSettings}>
+        Go to Settings
+      </button>
       <h2>Saved Restaurants</h2>
       
       {Object.keys(accountInfo.likedRestaurants).length > 0 ? (
@@ -65,7 +62,7 @@ const ProfilePage = () => {
           <RestaurantListItem 
             key={id} 
             restaurant={restaurant} 
-            onDelete={() => handleDelete(id)}
+            onDelete={() => handleDelete(restaurant._id)}
           />
         ))
       ) : (
@@ -74,9 +71,7 @@ const ProfilePage = () => {
         </p>
       )}
 
-      <button className="settings-button" onClick={handleGoToSettings}>
-        Go to Settings
-      </button>
+     
     </div>
   );
 };
