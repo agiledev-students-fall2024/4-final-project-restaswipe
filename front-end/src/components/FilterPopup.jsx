@@ -193,7 +193,8 @@ const FilterPopup = ({ open, close, onApplyFilters, onSelectRestaurant, filters 
                 className="filter-dropdown-item"
                 onClick={() =>
                   {
-                    if (option === "cusine") {
+                    console.log(option)
+                    if (cuisines.includes(option)) {
                       handleSelectCuisine(option);
                     } else {
                       handleSelectNeighborgood(option);
