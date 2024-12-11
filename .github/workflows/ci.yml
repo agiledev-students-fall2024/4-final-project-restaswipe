@@ -10,9 +10,6 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [18.x] # Adjust Node versions as needed
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -20,12 +17,12 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
-
+          node-version: '16.x'
 
       - name: Install dependencies
+        working-directory: ./back-end
         run: npm install
 
-      # Run tests
       - name: Run tests
+        working-directory: ./back-end
         run: npm test
