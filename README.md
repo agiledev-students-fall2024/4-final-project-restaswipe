@@ -1,5 +1,6 @@
 # Live version
 * https://walrus-app-qmzqc.ondigitalocean.app/login
+* We incorporated CI with GitHub actions to run our backend unit tests. We incorporated CD with Digital Ocean App Platform. 
 
 # Project Repository
 
