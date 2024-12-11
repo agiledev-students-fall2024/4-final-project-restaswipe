@@ -30,4 +30,6 @@ jobs:
         env:
           NODE_ENV: test
           MONGO_URI: mongodb+srv://test
+          JWT_SECRET: WA3BdyN2XxdDHmAkxD7nAeexNXYFP5lk
+          
         run: npm test
