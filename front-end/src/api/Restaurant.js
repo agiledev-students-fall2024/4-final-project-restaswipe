@@ -70,3 +70,31 @@ export async function dislikeRestaurant(restaurantId) {
     console.error(`Error disliking restaurant ${restaurantId}:`, error);
   }
 }
+
+export async function getCuisines() {
+
+  try {
+    const response = await axiosInstance.get(`/restaurants/cuisines`);
+    const data = response.data;
+
+    console.error(data);
+    return data;
+  } catch (error) {
+    console.error('Error searching for restaurants:', error);
+    return [];
+  }
+}
+
+export async function getNeighborhoods() {
+
+  try {
+    const response = await axiosInstance.get(`/restaurants/neighborhoods`);
+    const data = response.data;
+
+    console.error(data);
+    return data;
+  } catch (error) {
+    console.error('Error searching for restaurants:', error);
+    return [];
+  }
+}

@@ -179,6 +179,48 @@ const restaurantRoutes = () => {
     }
   );
 
+  router.get(
+    '/cuisines',
+    authenticate,
+    async (req, res) => {
+      // Handle validation errors
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        // Return validation errors
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      try {
+        const cuisines = await Restaurant.distinct("cuisine")
+        res.json(cuisines);
+      } catch (error) {
+        console.error('Error fetching cuisine:', error);
+        res.status(500).send('Error fetching cuisines');
+      }
+    }
+  );
+
+  router.get(
+    '/neighborhoods',
+    authenticate,
+    async (req, res) => {
+      // Handle validation errors
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        // Return validation errors
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      try {
+        const neighborhoods = await Restaurant.distinct("neighborhood")
+        res.json(neighborhoods);
+      } catch (error) {
+        console.error('Error fetching cuisine:', error);
+        res.status(500).send('Error fetching cuisines');
+      }
+    }
+  );
+
   return router;
 };
 
