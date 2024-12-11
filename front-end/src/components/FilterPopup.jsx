@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/FilterPopup.css';
-import { searchRestaurants } from '../api/Restaurant';
+import { getCuisines, getNeighborhoods, searchRestaurants } from '../api/Restaurant';
 
+/*
 const cuisines = [
   "American", "Chinese", "Italian", "Mexican", "Japanese", "French", "Thai", "Indian",
   "Mediterranean", "Greek", "Spanish", "Korean", "Vietnamese", "Middle Eastern", "Lebanese",
@@ -18,9 +19,11 @@ const neighborhoods = [
   "Roosevelt Island", "SoHo", "Tribeca", "Upper East Side", "Upper West Side",
   "Washington Heights", "West Village"
 ];
-
+*/
 const FilterPopup = ({ open, close, onApplyFilters, onSelectRestaurant, filters }) => {
   const [search, setSearch] = useState('');
+  const [cuisines, setCuisines] = useState([]);
+  const [neighborhoods, setNeighborhoods] = useState([]);
   const [selectedCuisines, setSelectedCuisines] = useState([]);
   const [selectedNeighborhoods, setSelectedNeighborhoods] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
@@ -103,6 +106,31 @@ const FilterPopup = ({ open, close, onApplyFilters, onSelectRestaurant, filters 
     setSearchResults([]);
     close();
   };
+
+  function capitalizeFirstLetter(val) {
+    return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+  }
+
+  function processPills(arr) {
+    return arr
+        .filter(str => str.trim() !== '') // Remove empty strings or strings with only whitespace
+        .map(str => str
+            .toLowerCase()
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ')
+        );
+  }
+
+  useEffect(() => {
+    async function fetchPills() {
+      const neighborhoods = await getNeighborhoods();
+      const cuisines = await getCuisines();
+      setNeighborhoods(processPills(neighborhoods))
+      setCuisines(processPills(cuisines))
+    }
+    fetchPills()
+  }, [])
 
   useEffect(() => {
     if(!filters?.cuisines?.length) setSelectedCuisines([]);
