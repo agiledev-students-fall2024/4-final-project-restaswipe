@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x, 18.x] # Adjust Node versions as needed
+        node-version: [18.x] # Adjust Node versions as needed
     steps:
       - name: Check out code
         uses: actions/checkout@v2
