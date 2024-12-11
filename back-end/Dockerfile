@@ -1,11 +1,13 @@
 FROM node:22-alpine
 
-COPY package.json package.json
-COPY package-lock.json package-lock.json
-COPY . .
+WORKDIR /usr/src/app
 
+# Copy only package files to install dependencies
+COPY package*.json ./
 RUN npm install
 
-EXPOSE 8000
+# Copy the rest of the application code
+COPY . .
 
+EXPOSE 8000
 CMD [ "npm", "start" ]

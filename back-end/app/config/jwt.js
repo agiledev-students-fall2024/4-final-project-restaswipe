@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const ObjectId = mongoose.Types.ObjectId
-const User = require('../models/User')
+const User = require('../models/user')
 
 const passportJWT = require('passport-jwt')
 const ExtractJwt = passportJWT.ExtractJwt

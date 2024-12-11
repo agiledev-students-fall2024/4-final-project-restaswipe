@@ -11,10 +11,11 @@ require('dotenv').config({ silent: true });
 const mongoose = require('mongoose');
 
 const app = express();
-
+console.log(process.env.MONGO_URI, 'MONGO_URI');
 // DB setup
 if (process.env.NODE_ENV !== 'test') {
   // DB setup
+  console.log(process.env.MONGO_URI, 'setup');
   try {
     mongoose.connect(process.env.MONGO_URI);
     console.log('Connected to MongoDB.');

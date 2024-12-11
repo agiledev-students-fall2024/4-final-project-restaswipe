@@ -1,5 +1,5 @@
 const express = require('express');
-const User = require('../models/User');
+const User = require('../models/user');
 const { send_otp_email } = require('../controllers/email_sender');
 require('dotenv').config();
 const { body, validationResult } = require('express-validator');
