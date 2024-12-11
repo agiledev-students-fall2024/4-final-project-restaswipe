@@ -2,24 +2,6 @@ import React, { useEffect, useState } from 'react';
 import '../styles/FilterPopup.css';
 import { getCuisines, getNeighborhoods, searchRestaurants } from '../api/Restaurant';
 
-/*
-const cuisines = [
-  "American", "Chinese", "Italian", "Mexican", "Japanese", "French", "Thai", "Indian",
-  "Mediterranean", "Greek", "Spanish", "Korean", "Vietnamese", "Middle Eastern", "Lebanese",
-  "Turkish", "Caribbean", "Latin American", "African", "Vegetarian", "Vegan", "Seafood",
-  "Steakhouse", "Pizza", "Burgers", "Sushi", "Barbecue", "Tapas", "Bakery", "Cafe", "Diner",
-  "Dessert", "Breakfast", "Brunch", "Cocktails", "Wine Bar",
-];
-
-const neighborhoods = [
-  "Alphabet City", "Battery Park City", "Carnegie Hill", "Chelsea", "Chinatown", "East Harlem",
-  "East Village", "Financial District", "Flatiron District", "Gramercy Park", "Greenwich Village",
-  "Harlem", "Hells Kitchen", "Clinton", "Inwood", "Kips Bay", "Lincoln Square", "Lower East Side",
-  "Manhattan Valley", "Midtown East", "Morningside Heights", "Murray Hill", "Little Italy",
-  "Roosevelt Island", "SoHo", "Tribeca", "Upper East Side", "Upper West Side",
-  "Washington Heights", "West Village"
-];
-*/
 const FilterPopup = ({ open, close, onApplyFilters, onSelectRestaurant, filters }) => {
   const [search, setSearch] = useState('');
   const [cuisines, setCuisines] = useState([]);
