@@ -29,4 +29,5 @@ jobs:
         working-directory: ./back-end
         env:
           NODE_ENV: test
+          MONGO_URI: mongodb+srv://test
         run: npm test
