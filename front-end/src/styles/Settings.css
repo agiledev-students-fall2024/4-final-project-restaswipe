@@ -3,35 +3,41 @@ body {
 }
 
 .settings-page {
-  max-width: 1200px;
+  position: relative;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 24px;
+  padding: 16px;
   background-color: #f8f9fa;
   min-height: 100vh;
 }
 
 .settings-title {
-  font-size: 32px;
+  /* Font size and weight */
+  font-size: 24px;
   font-weight: bold;
+
+  /* Color */
   color: #333;
-  margin-bottom: 24px;
+
+  /* Margin */
+  margin-bottom: 16px;
 }
 
 .settings-subtitle {
   margin: 0 0 16px 0;
   color: #1a1a1a;
-  font-size: 28px;
+  font-size: 18px;
 }
 
 .profile-details {
   display: flex;
   align-items: center;
-  padding: 20px;
+  padding: 16px;
   background-color: white;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .profile-email {
@@ -56,10 +62,10 @@ body {
 
 .further-functionality {
   background-color: white;
-  padding: 24px;
+  padding: 16px;
   border-radius: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .expansion-message {
@@ -72,7 +78,7 @@ body {
 }
 
 .profile-reroute {
-  margin-top: 20px;
+  margin-top: 16px;
 }
 
 .profile-button {
@@ -91,7 +97,7 @@ body {
 }
 
 .settings-logout {
-  margin-top: 20px;
+  margin-top: 16px;
 }
 
 .logout-button {
@@ -111,5 +117,5 @@ body {
 
 .error-message {
   color: red;
-  margin-top: 20px;
+  margin-top: 16px;
 }

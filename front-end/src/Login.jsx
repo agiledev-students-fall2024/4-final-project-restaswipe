@@ -45,8 +45,8 @@ const Login = () => {
 
   return (
     <div className="login" style={{ textAlign: 'center', paddingTop: '50px' }}>
-      <h1>Restaswipe</h1>
-      <h3>Tinder but for restaurants</h3>
+      <h1>RestaSwipe</h1>
+      <h3>Tinder... but for restaurants.</h3>
       <h2>Login with OTP</h2>
 
       {!showOtpInput ? (
