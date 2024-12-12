@@ -1,51 +1,111 @@
-/* src/styles/SwipeableFeed.css */
-
 .swipable-feed {
   position: relative;
+
   width: 100%;
   height: calc(100vh - 64px);
+
   overflow: hidden;
+
   user-select: none;
+
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: none;
 }
+
 
 .loading {
+
   position: absolute;
   bottom: 50%;
+  transform: translateY(50%);
+
+
   width: 100%;
+
+
   text-align: center;
   font-size: 18px;
   color: #666;
+
+
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: none;
 }
+
 
 .no-more-restaurants {
+
   position: absolute;
   bottom: 50%;
+  transform: translateY(50%);
+
+
   width: 100%;
+
+
   text-align: center;
   font-size: 18px;
   color: #666;
+
+
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: none;
 }
 
+
 .selected-restaurant {
+
   position: absolute;
   top: 0;
+  left: 0;
+
+
   width: 100%;
   height: calc(100vh - 64px);
+
+
   background-color: #fff;
+
+
   z-index: 2000;
+
+
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: none;
 }
 
 .selected-restaurant .restaurant-card {
+
   height: 100%;
 }
 
+
 .back-button {
+
   position: absolute;
   top: 16px;
   left: 16px;
+
+
   z-index: 2100;
+
+
   background: none;
   border: none;
   font-size: 24px;
   cursor: pointer;
+
+
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: none;
 }
